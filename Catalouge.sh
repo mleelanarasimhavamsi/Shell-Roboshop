@@ -77,5 +77,5 @@ VALIDATE $? "Install MongoDb Client"
 mongosh --host $MONGODB_HOST </app/db/master-data.js
 VALIDATE $? "Load Catalouge products"
 
-systemctl restart Catalouge
-VALIDATE $? "Restarting Catalouge"
+# systemctl restart Catalouge
+# VALIDATE $? "Restarting Catalouge"
