@@ -65,18 +65,11 @@ VALIDATE $? "Install Dependecies"
 cp $SCRIPT_DIRECTORY/Catalouge.service /etc/systemd/system/catalogue.service
 VALIDATE $? "Copy systemctl service"
 
-
-
 systemctl enable catalogue 
 VALIDATE $? "Enable Catalouge"
 
-
-
-
 cp $SCRIPT_DIRECTORY/mongo.repo/etc/yum.repos.d/mongo.repo
 VALIDATE $? "Copy Mongo repo"
-
-
 
 dnf install mongodb-mongosh -y
 VALIDATE $? "Install MongoDb Client"
