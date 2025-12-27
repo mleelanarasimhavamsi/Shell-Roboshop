@@ -71,7 +71,7 @@ VALIDATE $? "Copy systemctl service"
 systemctl enable catalogue 
 VALIDATE $? "Enable Catalouge"
 
-cp $SCRIPT_DIRECTORY/mongo.repo/etc/yum.repos.d/mongo.repo
+cp $SCRIPT_DIRECTORY/mongo.repo /etc/yum.repos.d/mongo.repo
 VALIDATE $? "Copy Mongo repo"
 
 dnf install mongodb-mongosh -y
