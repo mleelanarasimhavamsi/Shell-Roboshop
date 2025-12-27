@@ -41,11 +41,12 @@ VALIDATE $? "Instaling node"
 
 
 id roboshop
-if [$? -ne 0]; then 
+if [ $? -ne 0 ]; then 
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
     VALIDATE $? "Creating System user"
 else
     echo "User already exist...$Y Skipping $N"
+fi
 
 mkdir -p /app 
 VALIDATE $? "Creating app Directory"
@@ -77,5 +78,5 @@ VALIDATE $? "Install MongoDb Client"
 mongosh --host $MONGODB_HOST </app/db/master-data.js
 VALIDATE $? "Load Catalouge products"
 
-# systemctl restart Catalouge
-# VALIDATE $? "Restarting Catalouge"
+systemctl restart Catalouge
+VALIDATE $? "Restarting Catalouge"
