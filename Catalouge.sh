@@ -10,6 +10,7 @@ LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 MONGODB_HOST=mongodb.vamsimln.online
+SCRIPT_DIRECTORY=$PWD
 
 mkdir -p $LOGS_FOLDER
 echo "Script started executed at: $(date)" | tee -a $LOG_FILE
@@ -39,11 +40,14 @@ dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "Instaling node"
 
 
+id roboshop
+if [$? -ne 0]; then 
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+    VALIDATE $? "Creating System user"
+else
+    echo "User already exist...$Y Skipping $N"
 
-useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
-VALIDATE $? "Creating System user"
-
-mkdir /app 
+mkdir -p /app 
 VALIDATE $? "Creating app Directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
@@ -58,26 +62,21 @@ VALIDATE $? "Unzip Catalouge"
 npm install 
 VALIDATE $? "Install Dependecies"
 
-cp Catalouge.service /etc/systemd/system/catalogue.service
+cp $SCRIPT_DIRECTORY/Catalouge.service /etc/systemd/system/catalogue.service
 VALIDATE $? "Copy systemctl service"
 
-systemctl daemon-reload
-VALIDATE $? ""
+
 
 systemctl enable catalogue 
 VALIDATE $? "Enable Catalouge"
 
-systemctl start catalogue
 
 
-cp Catalouge.service /etc/yum.repos.d/mongo.repo
+
+cp $SCRIPT_DIRECTORY/mongo.repo/etc/yum.repos.d/mongo.repo
 VALIDATE $? "Copy Mongo repo"
 
-[mongodb-org-7.0]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/9/mongodb-org/7.0/x86_64/
-enabled=1
-gpgcheck=0
+
 
 dnf install mongodb-mongosh -y
 VALIDATE $? "Install MongoDb Client"
@@ -85,4 +84,5 @@ VALIDATE $? "Install MongoDb Client"
 mongosh --host $MONGODB_HOST </app/db/master-data.js
 VALIDATE $? "Load Catalouge products"
 
-mongosh --host MONGODB-SERVER-IPADDRESS
+systemctl restart catalouge
+VALIDATE $? "Restarting Catalouge"
